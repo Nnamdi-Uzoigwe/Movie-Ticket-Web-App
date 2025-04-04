@@ -1,158 +1,203 @@
-"use client"
-import React, { useEffect, useState } from 'react'
-import { IoLocationOutline } from "react-icons/io5";
-import image1 from "@/assets/card1.svg"
-import Image from 'next/image';
-import Link from 'next/link';
-import { useParams } from 'next/navigation';
 
+"use client";
+import React, { useEffect, useState } from "react";
+import { IoLocationOutline } from "react-icons/io5";
+import Image from "next/image";
+import Link from "next/link";
+import { useParams } from "next/navigation";
 
 const MovieDetail = () => {
-const [data, setData] = useState()
+  const [data, setData] = useState(null);
+  const [dateArray, setDateArray] = useState([]);
+  const { id } = useParams();
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedTime, setSelectedTime] = useState(null);
+  const [selectedCinema, setSelectedCinema] = useState(null)
 
-const {id} = useParams()
+  const handleSetDate = (selectedDate) => {
+    setSelectedDate(selectedDate);
+  };
 
-    const url = `https://imdb-top-100-movies.p.rapidapi.com/${id}`;
-    const options = {
-    method: 'GET',
-    headers: {
-    'x-rapidapi-key': '8d63ad786dmshc61c45ee50bcb6bp1502f0jsn70024eaebe76',
-    'x-rapidapi-host': 'imdb-top-100-movies.p.rapidapi.com'
-    }
+  const handleSetTime = (selectedTime) => {
+    setSelectedTime(selectedTime)
+  }
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch("/movie-data.json");
+        const result = await response.json();
+        const movie = result.find((item) => item.id === id);
+
+        if (movie) {
+          setData(movie);
+        } else {
+          console.error("Movie not found");
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
     };
 
+    if (id) fetchData();
+  }, [id]);
 
-    useEffect(() => {
-    const fetchData = async() => {
+  useEffect(() => {
+    const getNextFiveDays = () => {
+      const days = ["Sun", "Mon", "Tue", "Wed", "Thur", "Fri", "Sat"];
+      const months = [
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec",
+      ];
+      const today = new Date();
+      const dates = [];
 
-        try {
-            const response = await fetch(url, options);
-            const result = await response.json();
-            setData(result);
-        } catch (error) {
-            console.error(error);
-        }
-        }
+      for (let i = 0; i < 5; i++) {
+        const nextDate = new Date();
+        nextDate.setDate(today.getDate() + i);
 
-        fetchData()
-    }, [])
+        const date = nextDate.getDate();
+        const month = months[nextDate.getMonth()];
+        const day = days[nextDate.getDay()];
 
-const dateArray = [
-    {
-        date: "22-oct",
-        day: "Mon"
-    },
-    {
-        date: "23-oct",
-        day: "Tue"
-    },
-    {
-        date: "24-oct",
-        day: "Wed"
-    },
-    {
-        date: "25-oct",
-        day: "Thur"
-    },
-    {
-        date: "26-oct",
-        day: "Fri"
-    },
-    {
-        date: "27-oct",
-        day: "Sat"
-    },
+        dates.push({
+          date: `${date}-${month}`,
+          day: day,
+        });
+      }
 
-]
+      setDateArray(dates);
+    };
 
-const timeArray = ["15:40", "16:40", "17:40", "18:40"]
+    getNextFiveDays();
+  }, []);
 
+  const timeArray = ["15:40", "16:40", "17:40", "18:40"];
 
+  const now = new Date();
 
+  const formattedDate = now.toLocaleDateString("en-US", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+
+  const formattedTime = now.toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+
+  function handleSetCinema(cinema) {
+    setSelectedCinema(cinema)
+  }
+
+  const isSelectionComplete = selectedCinema && selectedDate && selectedTime;
 
   return (
-    <div className='text-white px-[6.944vw] py-[4vw] '>
-        <div className='flex justify-between '>
-            <div className=' flex flex-col gap-[4.94vw]'>
-                <div className='flex flex-col gap-[1.5vw]'>
-                    <p className='text-white text-[2.5vw] font-[600]'>Theater</p>
-                    <div className=' flex gap-[1.11vw]'>
-                        <div className='text-[1.39vw] border hover:bg-[#1DE782] cursor-pointer border-white w-fit flex items-center py-[0.625vw] px-[1.042vw] rounded-[2.71vw] gap-[0.9vw]'>
-                            <IoLocationOutline  className='text-[1.5vw]'/>
-                            <p>Bukit Bintang</p>
-                        </div>
-                        <div className='text-[1.39vw] border hover:bg-[#1DE782] cursor-pointer border-white w-fit flex items-center py-[0.625vw] px-[1.042vw] rounded-[2.71vw] gap-[0.9vw]'>
-                            <IoLocationOutline  className='text-[1.5vw]'/>
-                            <p>IOI Putrajaye</p>
-                        </div>
-                        <div className='text-[1.39vw] border hover:bg-[#1DE782] cursor-pointer border-white w-fit flex items-center py-[0.625vw] px-[1.042vw] rounded-[2.71vw] gap-[0.9vw]'>
-                            <IoLocationOutline  className='text-[1.5vw]'/>
-                            <p>KB Mall</p>
-                        </div>
-                    </div>
+    <div className="text-white p-6 md:p-12 lg:p-20">
+      <div className="flex flex-col lg:flex-row justify-between gap-6">
+        <div className="flex flex-col w-full lg:w-2/3 space-y-6">
+          <div>
+            <p className="text-lg font-semibold mb-2">Theaters/Cinemas</p>
+            <div className="flex flex-wrap gap-3">
+              {data?.cinemas?.map((cinema, index) => (
+                <div
+                  key={index}
+                  onClick={() => handleSetCinema(cinema)}
+                  className={`text-sm md:text-lg border border-white p-2 rounded-md ${selectedCinema === cinema ? "bg-[#1DE782]" : "bg-transparent"} cursor-pointer flex items-center gap-1`}
+                >
+                  <IoLocationOutline className="text-lg" />
+                  <p>{cinema}</p>
                 </div>
-                <div className='flex flex-col gap-[1.5vw]'>
-                    <p className='text-white text-[2.5vw] font-[600]'>Date</p>
-                    <div className='flex gap-[1.39vw]' >
-                        {
-                            dateArray.map((item, index) => (
-                                <div key={index} className='flex flex-col justify-center rounded-[0.56vw] items-center w-[5.9vw] h-[5.9vw] border-[0.13vw] border-white cursor-pointer hover:bg-[#1DE782]'>
-                                    <p className='text-[1.11vw]'>{item.date}</p>
-                                    <p className='font-[900] text-[1.39vw]'>{item.day}</p>
-                                </div>
-                            ))
-                        }
-                    </div>
-                </div>
-                <div className='flex flex-col gap-[1.5vw]'>
-                    <p className='text-white text-[2.5vw] font-[600]'>Time</p>
-                    <div className='flex gap-[0.69vw]'>
-                        {
-                                timeArray.map((item, index) => (
-                                    <div key={index} className='flex flex-col justify-center rounded-[0.56vw] items-center w-[5.3vw] h-[2.78vw] border-[0.13vw] border-white cursor-pointer hover:bg-[#1DE782]'>
-                                        <p className='text-[1.11vw]'>{item}</p>
-                                    </div>
-                                ))
-                            }
-
-                    </div>
-                </div>
+              ))}
             </div>
-
-            <div className='w-[17.36vw] '> 
-                <Image src={data?.image} width={250} height={375} alt="alt" className=' w-[17.36vw] h-[26.04vw]'/>
-                <div className=' flex flex-col gap-[1vw] pt-[1vw]'>
-                    <p className='text-[1.667vw] font-[600] '>{data?.title}</p>
-                    <p>{data?.description}</p>
-                    <div className='flex justify-between pr-[2vw] '>
-                        <p>Duration</p>
-                        <p>2h 30m</p>
-                    </div>
-                    <div className='flex justify-between pr-[2vw]'>
-                        <p>Type</p>
-                        <p>{data?.genre?.[0]}</p>
-                    </div>
+          </div>
+          <div>
+            <p className="text-lg font-semibold mb-2">Date</p>
+            <div className="flex flex-wrap gap-3">
+              {dateArray.map((item, index) => (
+                <div
+                  key={index}
+                  onClick={() => handleSetDate(item)}
+                  className={`flex flex-col ${selectedDate === item ? "bg-[#1DE782]" : "bg-transparent"} justify-center items-center border border-white p-2 rounded-md cursor-pointer`}
+                >
+                  <p className="text-sm md:text-lg">{item.date}</p>
+                  <p className="font-bold text-sm md:text-lg">{item.day}</p>
                 </div>
-
+              ))}
             </div>
+          </div>
+          <div>
+            <p className="text-lg font-semibold mb-2">Time</p>
+            <div className="flex flex-wrap gap-3">
+              {timeArray.map((time, index) => (
+                <div
+                  key={index}
+                  onClick={() => handleSetTime(time)}
+                  className={`flex justify-center items-center border border-white p-2 rounded-md cursor-pointer ${selectedTime === time ? "bg-[#1DE782]" : "bg-transparent"}`}
+                >
+                  <p className="text-sm md:text-lg">{time}</p>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
-        <div className='w-full  flex justify-end mt-[4vw]'>
-            <div className='h-[22.57vw] w-[25.9vw] border-[0.069vw] border-white rounded-[1.39vw] flex flex-col px-[2.5vw] gap-[2vw] justify-center '>
-                <div className='flex flex-col gap-[2vh]'>
-                    <p className='text-[2.22vw] font-[600]'>IOI Putrajaye</p>
-                    <div className='text-[1.528vw]'>
-                        <p>28 October 2023</p>
-                        <p>15:40</p>
-                    </div>
-                    <p>*Seat selection can be done after this</p>
-                </div>
-               <Link href={"/seatselector"} ><button className='h-[3.33vw] rounded-[0.8vw] bg-[#1DE782] w-full font-[600]'>Proceed</button></Link>
+        <div className="w-full lg:w-1/3 flex flex-col items-center">
+          <Image
+            src={data?.image || "/placeholder-image.jpg"}
+            width={250}
+            height={375}
+            alt={data?.title || "Movie Image"}
+            className="rounded-lg"
+          />
+          <div className="mt-4 text-center">
+            <p className="font-semibold text-xl">{data?.title}</p>
+            <p className="text-gray-300">{data?.description}</p>
+            <div className="flex justify-between w-full mt-2">
+              <p className="text-gray-400">Rating</p>
+              <p className="text-gray-200">{data?.rating}</p>
             </div>
-
+            <div className="flex justify-between w-full">
+              <p className="text-gray-400">Type</p>
+              <p className="text-gray-200">{data?.genre?.[0]}</p>
+            </div>
+          </div>
         </div>
-
+      </div>
+      <div className="w-full flex justify-end mt-6">
+        <div className="border border-white p-6 rounded-lg flex flex-col gap-4 w-full md:w-1/3">
+          <div>
+            <p className="font-semibold text-lg">{selectedCinema}</p>
+            <p className="text-gray-400">{selectedDate?.date || formattedDate}</p>
+            <p className="text-gray-400">{selectedTime}</p>
+            <p className="text-xs text-gray-400 mt-2">
+              *Seat selection can be done after this
+            </p>
+          </div>
+          <Link href={`/seatselector/?date=${selectedDate?.date}&selectedCinema=${selectedCinema}&name=${data?.title}&time=${selectedTime}&id=${data?.imdbid}`}>
+            <button
+              className="rounded-md bg-[#1DE782] w-full font-semibold p-2"
+              disabled={!isSelectionComplete}
+              style={{ opacity: isSelectionComplete ? 1 : 0.5 }}
+            >
+              Proceed
+            </button>
+          </Link>
+        </div>
+      </div>
     </div>
-  )
-}
+  );
+};
 
-export default MovieDetail
+export default MovieDetail;

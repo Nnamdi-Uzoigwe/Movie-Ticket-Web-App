@@ -1,38 +1,105 @@
+"use client"
 import Link from 'next/link'
-import React from 'react'
+import React, { useState } from 'react'
 
 const Login = () => {
+const [email,setEmail] = useState("")
+const [password,setPassword] = useState("")
+const [signup, setSignup] = useState(false)
+const [error, setError] = useState("")
+
+
+
+const handleSubmit = async() => {
+    const data = {
+        email: email,
+        password: password
+    }
+
+    try {
+        const res = await fetch(`http://localhost:3000/api/${signup? "register" : "login"}`, {
+            method: "POST",
+            headers: {
+                "content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        })
+    
+        const response = await res.json()
+        if(res.status ===200 ){
+            if(signup){
+                setSignup(false)
+            } else{
+                window.location.href = "/home"
+            }
+            console.log(response)
+        }else{
+            setError(response.error)
+        }
+        
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+
+
   return (
-    <div className='w-[100vw] h-[100vh] flex items-center justify-center'>
-        <div className='bg-white w-[44.1vw] h-[36.39vw]  flex flex-col items-center justify-center rounded-[0.694vw]'>
-            <div className=' text-[2.08vw] font-[600] text-left'>
-                Login to your account
-            </div>
 
-            <div className='text-[1.11vw] flex flex-col gap-[1.83vw] '>
-                <div className='font-[400] flex flex-col gap-[1.83vw]'>
-                    <div className='flex flex-col gap-[0.83vw]'>
-                        <label>Username</label>
-                        <input placeholder='Enter your Username' type="text" className='w-[37.99vw] outline-none border border-[#BEBEBF] h-[3.33vw] rounded-[0.556vw] px-[1.1vw]' />
-                    </div>
-                    <div className='flex flex-col gap-[0.83vw]'>
-                        <label>Password</label>
-                        <input placeholder='Enter your Password' type="password" className='w-[37.99vw] outline-none border border-[#BEBEBF] h-[3.33vw] rounded-[0.556vw] px-[1.1vw]'/>
-                    </div>
-                </div>
+    <div className='h-screen flex flex-col items-center justify-center bg-gradient-to-b from-black to-green-900'>
+      <p className='text-white mb-4 text-xl'>Welcome to <span className='text-green-500'>Vilancy </span>Movie Ticket Platform!</p>
+      <div className='bg-white w-[90%] max-w-[400px] p-6 rounded-lg shadow-md'>
+        <h2 className='text-xl font-bold mb-4'>
+          {signup ? "Create an Account" : "Login to your account"}
+        </h2>
 
-                <div>
-                    <Link href={"/home"}>
-                        <button className='w-[37.99vw] h-[3.33vw] bg-[#1DE782] text-white rounded-[0.556vw] font-[600]'>Login Now</button>
-                    </Link>
-                </div>
-            </div>
-            <div className='pt-[1.1vw]'>
-                <p className='text-[#BEBEBF]'>Don't have an Account? <span className=' text-[#1DE782] cursor-pointer'>Register</span></p>
-            </div>
+        {error && <p className='text-red-600 text-sm italic mb-3'>{error}</p>}
+
+        <div className='mb-4'>
+          <label className='block text-sm font-medium mb-1'>Email</label>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder='Enter your email'
+            className='w-full px-3 py-2 border rounded-md outline-none border-gray-300'
+          />
         </div>
-    </div>
+
+        <div className='mb-4'>
+          <label className='block text-sm font-medium mb-1'>Password</label>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder='Enter your password'
+            className='w-full px-3 py-2 border rounded-md outline-none border-gray-300'
+          />
+        </div>
+
+        <button
+          onClick={handleSubmit}
+          className='w-full bg-[#1DE782] text-white py-2 rounded-md font-semibold hover:bg-green-500 transition-colors'
+        >
+          {signup ? "Register Now" : "Login Now"}
+        </button>
+
+        <p className='text-center text-sm text-gray-600 mt-4'>
+          {signup ? "Already have an account?" : "Don't have an account?"}
+          <span
+            onClick={() => setSignup(!signup)}
+            className='text-[#1DE782] ml-1 cursor-pointer font-medium'
+          >
+            {signup ? "Login" : "Register"}
+          </span>
+        </p>
+      </div>
+</div>
+
   )
 }
 
 export default Login
+
+
+
