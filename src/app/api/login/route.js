@@ -3,8 +3,16 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import dbConnect from "../../lib/mongodb";
 import User from "../../lib/models/user"
+import Cors from "cors"
 
 const JWT_SECRET = process.env.JWT_SECRET;
+
+const cors = initMiddleware(
+  Cors({
+    methods: ['GET', 'POST'],
+    origin: 'https://vilancy-movie-ticket-web-app.vercel.app', // Vercel frontend URL
+  })
+);
 
 export async function POST(req) {
   try {

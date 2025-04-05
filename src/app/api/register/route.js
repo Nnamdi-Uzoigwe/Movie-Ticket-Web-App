@@ -1,6 +1,15 @@
 import dbConnect from "../../lib/mongodb";
 import User from "../../lib/models/user"
 import bcrypt from "bcryptjs"
+import Cors from "cors"
+
+// Initialize CORS middleware
+const cors = initMiddleware(
+  Cors({
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    origin: 'https://vilancy-movie-ticket-web-app.vercel.app', // Vercel frontend URL
+  })
+);
 
 import { NextResponse } from "next/server";
 
