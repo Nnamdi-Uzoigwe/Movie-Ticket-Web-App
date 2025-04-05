@@ -2,12 +2,13 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import dbConnect from "../../lib/mongodb";
-import User from "../../lib/models/user"
-import Cors from "cors"
-import initMiddleware from "../../lib/initMiddleware"
+import User from "../../lib/models/user";
+import Cors from "cors";
+import initMiddleware from "../../lib/initMiddleware";
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
+// Initialize CORS middleware
 const cors = initMiddleware(
   Cors({
     methods: ['GET', 'POST'],
@@ -16,6 +17,8 @@ const cors = initMiddleware(
 );
 
 export async function POST(req) {
+  await cors(req); // Apply CORS to the incoming request
+
   try {
     const { email, password } = await req.json();
 
