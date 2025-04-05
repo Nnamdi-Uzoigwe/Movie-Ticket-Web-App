@@ -3,59 +3,54 @@ import Link from 'next/link'
 import React, { useState } from 'react'
 
 const Login = () => {
-const [email,setEmail] = useState("")
-const [password,setPassword] = useState("")
-const [signup, setSignup] = useState(false)
-const [error, setError] = useState("")
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [signup, setSignup] = useState(false)
+  const [error, setError] = useState("")
 
-
-
-const handleSubmit = async() => {
+  const handleSubmit = async () => {
     const data = {
-        email: email,
-        password: password
+      email: email,
+      password: password
     }
 
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'; // Default to localhost in development
+
     try {
-      const res = await fetch(`http://localhost:3000/api/${signup ? "register" : "login"}`, {
-          method: "POST",
-          headers: {
-              "Content-Type": "application/json"
-          },
-          body: JSON.stringify(data)
+      const res = await fetch(`${apiUrl}/api/${signup ? "register" : "login"}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
       });
-  
+
       const response = await res.json();
-  
+
       if (res.status === 200) {
-          // If it's a login request
-          if (!signup) {
-              // Store the JWT token in localStorage upon successful login
-              if (response.token) {
-                  localStorage.setItem("token", response.token);
-                  console.log('Login successful, token stored in localStorage.');
-                  
-              }
-              window.location.href = "/home";
-          } else {
-              setSignup(false);
+        // If it's a login request
+        if (!signup) {
+          // Store the JWT token in localStorage upon successful login
+          if (response.token) {
+            localStorage.setItem("token", response.token);
+            console.log('Login successful, token stored in localStorage.');
           }
-  
-          console.log(response);
+          window.location.href = "/home";
+        } else {
+          setSignup(false);
+        }
+
+        console.log(response);
       } else {
-          setError(response.error);
+        setError(response.error);
       }
-  
-  } catch (error) {
+
+    } catch (error) {
       console.log(error);
+    }
   }
-  
-}
-
-
 
   return (
-
     <div className='h-screen flex flex-col items-center justify-center bg-gradient-to-b from-black to-green-900'>
       <p className='text-white mb-4 text-xl'>Welcome to <span className='text-green-500'>Vilancy </span>Movie Ticket Platform!</p>
       <div className='bg-white w-[90%] max-w-[400px] p-6 rounded-lg shadow-md'>
@@ -104,12 +99,8 @@ const handleSubmit = async() => {
           </span>
         </p>
       </div>
-</div>
-
+    </div>
   )
 }
 
 export default Login
-
-
-
