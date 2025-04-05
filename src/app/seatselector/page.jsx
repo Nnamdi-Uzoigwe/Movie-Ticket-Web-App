@@ -3,7 +3,8 @@
 import Link from 'next/link';
 import React, { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import jwt from "jsonwebtoken"
+import { jwtDecode } from 'jwt-decode';
+
 const SeatSelection = () => {
   const rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
   const columns = Array.from({ length: 10 }, (_, i) => i + 1);
@@ -19,7 +20,7 @@ const SeatSelection = () => {
   const token = localStorage.getItem("token")
   
 
-  const decoded = jwt.decode(token)
+  const decoded = jwtDecode(token)
   const userId = decoded.id
   const toggleSeatSelection = (seat) => {
     setSelectedSeats((prevSelectedSeats) =>
