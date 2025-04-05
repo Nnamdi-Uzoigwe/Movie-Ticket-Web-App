@@ -1,23 +1,23 @@
-"use client"
+
+"use client";
+import React, { Suspense } from "react";
 import Link from "next/link";
-import React from "react";
 import { useSearchParams } from "next/navigation";
-function BookingDetail() {
-  const searchParams = useSearchParams()
 
-const date = searchParams.get("date");
-const selectedCinema = searchParams.get("selectedCinema"); 
-const name = searchParams.get("name");
-const time = searchParams.get("time");
-const selectedSeatsParam = searchParams.get("selectedSeats");
+const BookingDetail = () => {
+  const searchParams = useSearchParams();
 
-const selectedSeats = selectedSeatsParam ? selectedSeatsParam.split(",") : [];
-const seatCount = selectedSeats.length;
-const seatPrice = 3000;
-const totalPrice = seatCount * seatPrice;
-const finalPayment = (totalPrice * 0.04) + totalPrice
+  const date = searchParams.get("date");
+  const selectedCinema = searchParams.get("selectedCinema");
+  const name = searchParams.get("name");
+  const time = searchParams.get("time");
+  const selectedSeatsParam = searchParams.get("selectedSeats");
 
-
+  const selectedSeats = selectedSeatsParam ? selectedSeatsParam.split(",") : [];
+  const seatCount = selectedSeats.length;
+  const seatPrice = 3000;
+  const totalPrice = seatCount * seatPrice;
+  const finalPayment = (totalPrice * 0.04) + totalPrice;
 
   return (
     <div className="flex items-center justify-center min-h-screen">
@@ -72,7 +72,12 @@ const finalPayment = (totalPrice * 0.04) + totalPrice
       </div>
     </div>
   );
-}
+};
 
-export default BookingDetail;
+const BookingDetailPage = () => (
+  <Suspense fallback={<div>Loading...</div>}>
+    <BookingDetail />
+  </Suspense>
+);
 
+export default BookingDetailPage;

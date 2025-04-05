@@ -9,6 +9,9 @@ const Home = () => {
   const [movie, setMovie] = useRecoilState(myMovieList);
 
   useEffect(() => {
+    const token = localStorage.getItem('token')
+    console.log(token);
+    
     const fetchMovies = async() => {
       try {
         const res = await fetch("/movie-data.json");

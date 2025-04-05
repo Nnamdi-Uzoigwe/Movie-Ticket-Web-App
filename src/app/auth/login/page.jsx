@@ -17,29 +17,39 @@ const handleSubmit = async() => {
     }
 
     try {
-        const res = await fetch(`http://localhost:3000/api/${signup? "register" : "login"}`, {
-            method: "POST",
-            headers: {
-                "content-Type": "application/json"
-            },
-            body: JSON.stringify(data)
-        })
-    
-        const response = await res.json()
-        if(res.status ===200 ){
-            if(signup){
-                setSignup(false)
-            } else{
-                window.location.href = "/home"
-            }
-            console.log(response)
-        }else{
-            setError(response.error)
-        }
-        
-    } catch (error) {
-        console.log(error)
-    }
+      const res = await fetch(`http://localhost:3000/api/${signup ? "register" : "login"}`, {
+          method: "POST",
+          headers: {
+              "Content-Type": "application/json"
+          },
+          body: JSON.stringify(data)
+      });
+  
+      const response = await res.json();
+  
+      if (res.status === 200) {
+          // If it's a login request
+          if (!signup) {
+              // Store the JWT token in localStorage upon successful login
+              if (response.token) {
+                  localStorage.setItem("token", response.token);
+                  console.log('Login successful, token stored in localStorage.');
+                  
+              }
+              window.location.href = "/home";
+          } else {
+              setSignup(false);
+          }
+  
+          console.log(response);
+      } else {
+          setError(response.error);
+      }
+  
+  } catch (error) {
+      console.log(error);
+  }
+  
 }
 
 

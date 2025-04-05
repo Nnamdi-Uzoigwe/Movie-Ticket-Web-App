@@ -1,10 +1,9 @@
 "use client"
+
 import Link from 'next/link';
 import React, { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import user from '../lib/models/user';
-
-
+import jwt from "jsonwebtoken"
 const SeatSelection = () => {
   const rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
   const columns = Array.from({ length: 10 }, (_, i) => i + 1);
@@ -12,13 +11,16 @@ const SeatSelection = () => {
   const [selectedSeats, setSelectedSeats] = useState([]);
   const searchParams = useSearchParams();
   const [error, setError] = useState("")
-  
   const date = searchParams.get("date");
   const selectedCinema = searchParams.get("selectedCinema"); 
   const name = searchParams.get("name");
   const time = searchParams.get("time");
   const id  = searchParams.get("id")
+  const token = localStorage.getItem("token")
   
+
+  const decoded = jwt.decode(token)
+  const userId = decoded.id
   const toggleSeatSelection = (seat) => {
     setSelectedSeats((prevSelectedSeats) =>
       prevSelectedSeats.includes(seat)
@@ -37,10 +39,8 @@ const SeatSelection = () => {
     }
   
     try {
-
-      console.log("movieId:", id); 
       
-      console.log("bookedSeats:", selectedSeats); 
+      console.log(userId)
       const getResponse = await fetch("/api/booking/get-booked-seats", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -57,18 +57,24 @@ const SeatSelection = () => {
         return;
       }
 
+      console.log("Request Body:", {
+        movieId: id,
+        userId: userId,
+        bookedSeats: selectedSeats,
+      });
+      
+
       const bookResponse = await fetch("/api/booking/book-seats", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           movieId: id,
-          userId: user._id,
+          userId: userId,
           bookedSeats: selectedSeats,
         }),
       });
-  
+      
       const bookData = await bookResponse.json();
-  
       if (!bookResponse.ok) {
         console.log(bookData.error || "Booking failed.");
         setError(bookData.error || "Booking failed.")
@@ -116,7 +122,7 @@ let total;
       <h1 className="text-3xl md:text-4xl mb-6">Seat Selection</h1>
       
       <div className="bg-white rounded-md p-6 shadow-lg w-full max-w-lg sm:max-w-xl md:max-w-2xl">
-        <div className="grid grid-cols-5 sm:grid-cols-10 gap-2 justify-center">
+        <div className="grid grid-cols-5 sm:grid-cols-10 gap-2 justify-items-center">
           {rows.map((row) =>
             columns.map((col) => {
               const seat = `${row}${col}`;
@@ -165,7 +171,7 @@ let total;
                 Proceed Payment
               </button>
           </div>
-              <p className="text-red-500 font-semibold">{error}</p>
+              {error && <p className="text-red-500 font-semibold">{error.message}</p>}
         </div>
       </div>
     </div>
