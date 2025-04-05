@@ -9,15 +9,15 @@ const bookingSchema = mongoose.Schema({
         {
             user: {
                 type: mongoose.Schema.Types.ObjectId,
-                ref: "user", // Reference to the User model
+                ref: "User", // Reference to the User model
                 required: true
             },
-            seatNo: {
-                type: String,
-                required: true
-            }
+            seatNo: String,  
+        
         }
     ]
 });
+
+
 
 export default mongoose.models.Booking || mongoose.model("Booking", bookingSchema);
