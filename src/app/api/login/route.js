@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 import dbConnect from "../../lib/mongodb";
 import User from "../../lib/models/user"
 import Cors from "cors"
+import initMiddleware from "../../lib/initMiddleware"
 
 const JWT_SECRET = process.env.JWT_SECRET;
 

@@ -2,7 +2,7 @@ import dbConnect from "../../lib/mongodb";
 import User from "../../lib/models/user"
 import bcrypt from "bcryptjs"
 import Cors from "cors"
-
+import initMiddleware from "../../lib/initMiddleware";
 // Initialize CORS middleware
 const cors = initMiddleware(
   Cors({
