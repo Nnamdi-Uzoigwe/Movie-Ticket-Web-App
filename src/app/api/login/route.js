@@ -54,56 +54,112 @@
 // }
 
 
-import { NextResponse } from "next/server";
-import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
-import dbConnect from "../../lib/mongodb";
-import User from "../../lib/models/user";
+// import { NextResponse } from "next/server";
+// import bcrypt from "bcryptjs";
+// import jwt from "jsonwebtoken";
+// import dbConnect from "../../lib/mongodb";
+// import User from "../../lib/models/user";
 
-const JWT_SECRET = process.env.JWT_SECRET;
+// const JWT_SECRET = process.env.JWT_SECRET;
 
-export default async function POST(req, res) {
-  // Set CORS headers
-  // res.setHeader('Access-Control-Allow-Origin', 'https://vilancy-movie-ticket-web-app.vercel.app'); // Replace with your specific origin
-  // res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  // res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+// export default async function POST(req, res) {
+//   // Set CORS headers
+//   // res.setHeader('Access-Control-Allow-Origin', 'https://vilancy-movie-ticket-web-app.vercel.app'); // Replace with your specific origin
+//   // res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+//   // res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
-  // Handle preflight requests
-  if (req.method === 'OPTIONS') {
-    res.status(200).end();
-    return;
-  }
+//   // Handle preflight requests
+//   if (req.method === 'OPTIONS') {
+//     res.status(200).end();
+//     return;
+//   }
 
+//   try {
+//     const { email, password } = req.body;
+
+//     if (!email || !password) {
+//       return res.status(400).json({ error: "Please fill all required fields" });
+//     }
+
+//     await dbConnect();
+
+//     // Check if user exists
+//     const user = await User.findOne({ email });
+//     if (!user) {
+//       return res.status(400).json({ error: "Invalid credentials" });
+//     }
+
+//     // Compare password
+//     const isMatch = await bcrypt.compare(password, user.password);
+//     if (!isMatch) {
+//       return res.status(400).json({ error: "Invalid credentials" });
+//     }
+
+//     // Create JWT token
+//     const token = jwt.sign({ id: user._id, email: user.email }, JWT_SECRET, { expiresIn: "2h" });
+
+//     return res.status(200).json({
+//       message: "Login successful",
+//       token,
+//       user: { id: user._id, email: user.email },
+//     });
+//   } catch (e) {
+//     return res.status(500).json({ error: e.message });
+//   }
+// }
+
+// app/api/login/route.js
+import { dbConnect } from '@/lib/mongodb';
+import User from '@/lib/models/user';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import { NextResponse } from 'next/server';
+
+export async function POST(req) {
   try {
-    const { email, password } = req.body;
+    const { email, password } = await req.json();
 
     if (!email || !password) {
-      return res.status(400).json({ error: "Please fill all required fields" });
+      return NextResponse.json(
+        { error: "Please fill all required fields" },
+        { status: 400 }
+      );
     }
 
     await dbConnect();
 
-    // Check if user exists
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(400).json({ error: "Invalid credentials" });
+      return NextResponse.json(
+        { error: "Invalid credentials" },
+        { status: 400 }
+      );
     }
 
-    // Compare password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).json({ error: "Invalid credentials" });
+      return NextResponse.json(
+        { error: "Invalid credentials" },
+        { status: 400 }
+      );
     }
 
-    // Create JWT token
-    const token = jwt.sign({ id: user._id, email: user.email }, JWT_SECRET, { expiresIn: "2h" });
+    const token = jwt.sign(
+      { id: user._id, email: user.email },
+      process.env.JWT_SECRET,
+      { expiresIn: "2h" }
+    );
 
-    return res.status(200).json({
+    return NextResponse.json({
       message: "Login successful",
       token,
-      user: { id: user._id, email: user.email },
-    });
+      user: { id: user._id, email: user.email }
+    }, { status: 200 });
+
   } catch (e) {
-    return res.status(500).json({ error: e.message });
+    return NextResponse.json(
+      { error: e.message },
+      { status: 500 }
+    );
   }
 }
