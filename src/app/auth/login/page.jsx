@@ -1,6 +1,6 @@
 
 "use client"
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 
 const Login = () => {
   const [email, setEmail] = useState("")
@@ -8,6 +8,17 @@ const Login = () => {
   const [signup, setSignup] = useState(false)
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
+  const [initialLoading, setInitialLoading] = useState(true)
+
+
+  useEffect(() => {
+    
+    const timer = setTimeout(() => {
+      setInitialLoading(false)
+    }, 2000) 
+
+    return () => clearTimeout(timer)
+  }, [])
 
   const handleSubmit = async () => {
     setLoading(true)
@@ -23,7 +34,6 @@ const Login = () => {
         body: JSON.stringify(data)
       })
 
-      // Handle potential empty responses
       const text = await res.text()
       const response = text ? JSON.parse(text) : {}
 
@@ -48,6 +58,17 @@ const Login = () => {
     } finally {
       setLoading(false)
     }
+  }
+
+  if (initialLoading) {
+    return (
+      <div className="h-screen flex items-center justify-center bg-gradient-to-b from-black to-green-900">
+        <div className="flex flex-col items-center">
+          <div className="w-16 h-16 border-4 border-t-green-500 border-transparent rounded-full animate-spin mb-4"></div>
+          <p className="text-white text-lg">Loading <span className="text-green-500">Vilancy</span> Movie Ticket Platform...</p>
+        </div>
+      </div>
+    )
   }
 
   return (
