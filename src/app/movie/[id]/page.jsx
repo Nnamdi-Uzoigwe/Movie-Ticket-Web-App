@@ -3,8 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { IoLocationOutline } from "react-icons/io5";
 import Image from "next/image";
-import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 
 const MovieDetail = () => {
   const [data, setData] = useState(null);
@@ -13,6 +12,8 @@ const MovieDetail = () => {
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedTime, setSelectedTime] = useState(null);
   const [selectedCinema, setSelectedCinema] = useState(null)
+  const router = useRouter()
+  const [isLoading, setIsLoading] = useState(false)
 
   const handleSetDate = (selectedDate) => {
     setSelectedDate(selectedDate);
@@ -104,6 +105,18 @@ const MovieDetail = () => {
 
   const isSelectionComplete = selectedCinema && selectedDate && selectedTime;
 
+  
+  const handleProceed = (e) => {
+    e.preventDefault();
+    if (!isSelectionComplete) return;
+    
+    setIsLoading(true);
+    router.push(
+      `/seatselector/?date=${selectedDate?.date}&selectedCinema=${selectedCinema}&name=${data?.title}&time=${selectedTime}&id=${data?.imdbid}`
+    );
+  };
+
+
   return (
     <div className="text-white p-6 md:p-12 lg:p-20">
       <div className="flex flex-col lg:flex-row justify-between gap-6">
@@ -185,15 +198,22 @@ const MovieDetail = () => {
               *Seat selection can be done after this
             </p>
           </div>
-          <Link href={`/seatselector/?date=${selectedDate?.date}&selectedCinema=${selectedCinema}&name=${data?.title}&time=${selectedTime}&id=${data?.imdbid}`}>
-            <button
-              className="rounded-md bg-[#1DE782] w-full font-semibold p-2"
-              disabled={!isSelectionComplete}
-              style={{ opacity: isSelectionComplete ? 1 : 0.5 }}
-            >
-              Proceed
-            </button>
-          </Link>
+          <button
+            onClick={handleProceed}
+            disabled={!isSelectionComplete || isLoading}
+            className={`rounded-md bg-[#1DE782] w-full font-semibold p-2 flex items-center justify-center ${
+              !isSelectionComplete || isLoading ? "opacity-50" : "hover:bg-green-600 transition-colors"
+            }`}
+          >
+            {isLoading ? (
+              <span className="flex items-center gap-2">
+                <span className="inline-block h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                Processing...
+              </span>
+            ) : (
+              "Proceed"
+            )}
+          </button>
         </div>
       </div>
     </div>

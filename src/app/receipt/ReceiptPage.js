@@ -1,9 +1,8 @@
 "use client"
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import html2canvas from "html2canvas";
 import { saveAs } from "file-saver";
-import { useRouter } from "next/navigation";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 
 export default function ReceiptPage() {
     const searchParams = useSearchParams()
@@ -13,17 +12,31 @@ export default function ReceiptPage() {
     const name = searchParams.get("name");
     const time = searchParams.get("time");
     const selectedSeats = searchParams.get("selectedSeats");
+    const [isDownloading, setIsDownloading] = useState(false);
+    const [isNavigating, setIsNavigating] = useState(false);
     const receiptRef = useRef(null);
   
     const router = useRouter()
-    // Function to capture and download the receipt as an image
-    const handleDownload = () => {
-      const receiptElement = receiptRef.current;
-      html2canvas(receiptElement).then((canvas) => {
+
+    const handleDownload = async () => {
+      setIsDownloading(true);
+      try {
+        const receiptElement = receiptRef.current;
+        const canvas = await html2canvas(receiptElement);
         canvas.toBlob((blob) => {
           saveAs(blob, "Ticket_Receipt.png");
         });
-      });
+      } catch (error) {
+        console.error("Download failed:", error);
+      } finally {
+        setIsDownloading(false);
+      }
+    };
+
+    
+    const handleNavigateHome = () => {
+      setIsNavigating(true);
+      router.push('/home');
     };
 
     return (
@@ -50,17 +63,36 @@ export default function ReceiptPage() {
             </div>
     
             <button
-              className="bg-green-500 text-white font-bold py-2 px-4 rounded-lg w-full hover:bg-green-600 mb-4"
-              onClick={handleDownload}
+                onClick={handleDownload}
+                disabled={isDownloading}
+                className={`bg-green-500 text-white font-bold py-2 px-4 rounded-lg w-full mb-4 flex items-center justify-center gap-2 ${
+                  isDownloading ? 'opacity-75' : 'hover:bg-green-600'
+                }`}
             >
-              Download Ticket
+                {isDownloading ? (
+                  <>
+                    <span className="inline-block h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                    Downloading...
+                  </>
+                ) : (
+                  'Download Ticket'
+                )}
             </button>
-    
             <button 
-              className="border border-gray-300 text-gray-800 font-bold py-2 px-4 rounded-lg w-full hover:bg-gray-200"
-              onClick={() => router.push('/home')}
+              onClick={handleNavigateHome}
+              disabled={isNavigating}
+              className={`border border-gray-300 text-gray-800 font-bold py-2 px-4 rounded-lg w-full flex items-center justify-center gap-2 ${
+                isNavigating ? 'opacity-75' : 'hover:bg-gray-200'
+              }`}
             >
-              Back to Homepage
+              {isNavigating ? (
+                <>
+                  <span className="inline-block h-5 w-5 border-2 border-gray-800 border-t-transparent rounded-full animate-spin"></span>
+                  Redirecting...
+                </>
+              ) : (
+                'Back to Homepage'
+              )}
             </button>
           </div>
         </div>

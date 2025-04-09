@@ -18,6 +18,8 @@ const SeatSelection = () => {
   const time = searchParams.get("time");
   const id  = searchParams.get("id")
 
+  const [isBooking, setIsBooking] = useState(false);
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
 
   const toggleSeatSelection = (seat) => {
     setSelectedSeats((prevSelectedSeats) =>
@@ -33,7 +35,6 @@ const handleBooking = async () => {
     return;
   }
 
-  // Get the token and decode it to extract userId
   const token = localStorage.getItem("token");
   if (!token) {
     setError("User not authenticated");
@@ -41,15 +42,17 @@ const handleBooking = async () => {
   }
 
   const decoded = jwtDecode(token);
-  const userId = decoded?.id || decoded?.userId; // Adjust based on your JWT payload
+  const userId = decoded?.id || decoded?.userId; 
 
   if (!userId) {
     setError("Could not retrieve userId from token");
     return;
   }
 
+  setIsBooking(true);
+
   try {
-    // Step 1: Check seat availability
+    
     const getResponse = await fetch("/api/booking/get-booked-seats", {
       method: "POST",
       headers: {
@@ -73,7 +76,8 @@ const handleBooking = async () => {
       return;
     }
 
-    // Step 2: Proceed with booking, including userId
+    setIsProcessingPayment(true);
+
     const bookResponse = await fetch("/api/booking/book-seats", {
       method: "POST",
       headers: {
@@ -82,7 +86,7 @@ const handleBooking = async () => {
       },
       body: JSON.stringify({
         movieId: id,
-        userId: userId, // Pass userId here
+        userId: userId, 
         bookedSeats: selectedSeats,
       }),
     });
@@ -94,7 +98,7 @@ const handleBooking = async () => {
 
     console.log("Redirecting to:", `/detail?total=${(selectedSeats.length * seatPrice).toFixed(2)}&selectedCinema=${encodeURIComponent(selectedCinema)}&name=${encodeURIComponent(name)}&time=${time}&date=${date}&selectedSeats=${selectedSeats.join(",")}`);
 
-    // Step 3: Redirect on success
+    
     router.push(
       `/detail?total=${(selectedSeats.length * seatPrice).toFixed(2)}` +
       `&selectedCinema=${encodeURIComponent(selectedCinema)}` +
@@ -108,7 +112,6 @@ const handleBooking = async () => {
     setError(error.message || "An unexpected error occurred. Please try again.");
   }
 };
-
 
   
   const handleCancelLastSeat = () => {
@@ -180,12 +183,28 @@ let total;
             <button onClick={handlePush} className="bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded-md transition-colors duration-300">
               Back
             </button>
-              <button 
-                className="bg-green-600 hover:bg-green-500 text-white py-2 px-4 rounded-md transition-colors duration-300"
+            <button 
+                className={`bg-green-600 hover:bg-green-500 text-white py-2 px-4 rounded-md transition-colors duration-300 flex items-center justify-center min-w-32 ${
+                  isBooking ? 'opacity-75' : ''
+                }`}
                 onClick={handleBooking}
-              >
-                Proceed Payment
-              </button>
+                disabled={isBooking || selectedSeats.length === 0}
+            >
+              {isBooking ? (
+                <>
+                  {isProcessingPayment ? (
+                    <>
+                      <span className="inline-block h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></span>
+                      Processing...
+                    </>
+                  ) : (
+                    "Verifying seats..."
+                  )}
+                </>
+              ) : (
+                "Proceed Payment"
+              )}
+            </button>
           </div>
               {error && <p className="text-red-500 font-semibold">{error.message}</p>}
         </div>

@@ -1,23 +1,38 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 
 
 export default function Details() {
     const searchParams = useSearchParams();
-    
+    const router = useRouter()
     const date = searchParams.get("date");
     const selectedCinema = searchParams.get("selectedCinema");
     const name = searchParams.get("name");
     const time = searchParams.get("time");
     const selectedSeatsParam = searchParams.get("selectedSeats");
+    const [isLoading, setIsLoading] = useState(false);
     
     const selectedSeats = selectedSeatsParam ? selectedSeatsParam.split(",") : [];
     const seatCount = selectedSeats.length;
     const seatPrice = 3000;
     const totalPrice = seatCount * seatPrice;
     const finalPayment = (totalPrice * 0.04) + totalPrice;
+
+
+    const handleCheckout = (e) => {
+      e.preventDefault()
+      setIsLoading(true)
+      router.push(
+        `/receipt/?total=${(selectedSeats.length * seatPrice).toFixed(2)}` +
+        `&selectedCinema=${selectedCinema}` +
+        `&name=${name}` +
+        `&time=${time}` +
+        `&date=${date}` +
+        `&selectedSeats=${selectedSeats.join(',')}`
+      )
+    }
 
     return (
         <div className="flex items-center justify-center min-h-screen">
@@ -63,12 +78,22 @@ export default function Details() {
             <div className="text-sm text-gray-600 mb-4">
               *Purchased ticket cannot be canceled
             </div>
-    
-            <Link href={`/receipt/?total=${(selectedSeats.length * seatPrice).toFixed(2)}&selectedCinema=${selectedCinema}&name=${name}&time=${time}&date=${date}&selectedSeats=${selectedSeats.join(',')}`}>
-              <button className="bg-green-500 text-white font-bold py-2 px-4 rounded-lg w-full hover:bg-green-600">
-                Checkout Ticket
-              </button>
-            </Link>
+            <button
+                  onClick={handleCheckout}
+                  disabled={isLoading}
+                  className={`bg-green-500 text-white font-bold py-2 px-4 rounded-lg w-full flex items-center justify-center gap-2 ${
+                    isLoading ? 'opacity-75' : 'hover:bg-green-600'
+                  }`}
+                >
+                  {isLoading ? (
+                    <>
+                      <span className="inline-block h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                      Processing...
+                    </>
+                  ) : (
+                    'Checkout Ticket'
+                  )}
+            </button>
           </div>
         </div>
       );
