@@ -8,14 +8,56 @@ const Login = () => {
   const [signup, setSignup] = useState(false)
   const [error, setError] = useState("")
 
+  // const handleSubmit = async () => {
+  //   const data = {
+  //     email: email,
+  //     password: password
+  //   }
+
+  //   const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'; // Default to localhost in development
+
+  //   try {
+  //     const res = await fetch(`${apiUrl}/api/${signup ? "register" : "login"}`, {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json"
+  //       },
+  //       body: JSON.stringify(data)
+  //     });
+
+  //     const response = await res.json();
+
+  //     if (res.status === 200) {
+  //       // If it's a login request
+  //       if (!signup) {
+  //         // Store the JWT token in localStorage upon successful login
+  //         if (response.token) {
+  //           localStorage.setItem("token", response.token);
+  //           console.log('Login successful, token stored in localStorage.');
+  //         }
+  //         window.location.href = "/home";
+  //       } else {
+  //         setSignup(false);
+  //       }
+
+  //       console.log(response);
+  //     } else {
+  //       setError(response.error);
+  //     }
+
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // }
+
   const handleSubmit = async () => {
     const data = {
       email: email,
       password: password
     }
-
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'; // Default to localhost in development
-
+  
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+  
     try {
       const res = await fetch(`${apiUrl}/api/${signup ? "register" : "login"}`, {
         method: "POST",
@@ -24,29 +66,30 @@ const Login = () => {
         },
         body: JSON.stringify(data)
       });
-
+  
       const response = await res.json();
-
-      if (res.status === 200) {
-        // If it's a login request
+  
+      if (res.ok) { // Check for any successful status (200-299)
         if (!signup) {
-          // Store the JWT token in localStorage upon successful login
+          // Login logic
           if (response.token) {
             localStorage.setItem("token", response.token);
-            console.log('Login successful, token stored in localStorage.');
           }
           window.location.href = "/home";
         } else {
+          // Registration success - show success message and switch to login
+          setError(""); // Clear any previous errors
+          alert("Registration successful! Please login.");
           setSignup(false);
+          setEmail(""); // Optional: clear form
+          setPassword("");
         }
-
-        console.log(response);
       } else {
-        setError(response.error);
+        setError(response.error || "Something went wrong");
       }
-
     } catch (error) {
       console.log(error);
+      setError("Network error - please try again");
     }
   }
 
