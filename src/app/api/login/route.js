@@ -57,8 +57,8 @@
 // import { NextResponse } from "next/server";
 // import bcrypt from "bcryptjs";
 // import jwt from "jsonwebtoken";
-// import dbConnect from "../../lib/mongodb";
-// import User from "../../lib/models/user";
+import dbConnect from "../../lib/mongodb";
+import User from "../../lib/models/user";
 
 // const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -109,8 +109,8 @@
 // }
 
 // app/api/login/route.js
-import { dbConnect } from '@/lib/mongodb';
-import User from '@/lib/models/user';
+// import { dbConnect } from '@/lib/mongodb';
+// import User from '@/lib/models/user';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { NextResponse } from 'next/server';
