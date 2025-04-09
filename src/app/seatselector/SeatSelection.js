@@ -216,7 +216,7 @@ let total;
             <button onClick={handlePush} className="bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded-md transition-colors duration-300">
               Back
             </button>
-            <button 
+            {/* <button 
                 className={`bg-green-600 hover:bg-green-500 text-white py-2 px-4 rounded-md transition-colors duration-300 flex items-center justify-center min-w-32 ${
                   isBooking ? 'opacity-75' : ''
                 }`}
@@ -237,7 +237,33 @@ let total;
               ) : (
                 "Proceed Payment"
               )}
-            </button>
+            </button> */}
+            <button 
+  className={`
+    bg-green-600 hover:bg-green-500 text-white 
+    py-3 z-10 px-6 rounded-md transition-colors duration-300 
+    flex items-center justify-center min-w-[140px]
+    ${isBooking ? 'opacity-75' : ''}
+    active:scale-95 transform transition-transform /* Add press effect */
+  `}
+  onClick={handleBooking}
+  disabled={isBooking || selectedSeats.length === 0}
+>
+  {isBooking ? (
+    <>
+      {isProcessingPayment ? (
+        <>
+          <span className="inline-block h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></span>
+          Processing...
+        </>
+      ) : (
+        "Verifying seats..."
+      )}
+    </>
+  ) : (
+    "Proceed Payment"
+  )}
+</button>
           </div>
               {error && <p className="text-red-500 font-semibold">{error.message}</p>}
         </div>
