@@ -62,7 +62,7 @@ import User from "../../lib/models/user";
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
-export default async function handler(req, res) {
+export default async function POST(req, res) {
   // Set CORS headers
   // res.setHeader('Access-Control-Allow-Origin', 'https://vilancy-movie-ticket-web-app.vercel.app'); // Replace with your specific origin
   // res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');

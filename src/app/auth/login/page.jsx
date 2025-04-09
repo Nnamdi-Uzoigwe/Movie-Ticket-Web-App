@@ -79,7 +79,7 @@ const Login = () => {
         } else {
           // Registration success - show success message and switch to login
           setError(""); // Clear any previous errors
-          alert("Registration successful! Please login.");
+          console.log("Registration successful! Please login.");
           setSignup(false);
           setEmail(""); // Optional: clear form
           setPassword("");
