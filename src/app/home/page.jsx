@@ -2,15 +2,27 @@
 
 import Cards from '@/components/home/Cards';
 import { myMovieList } from '@/store/atom/movielist';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
+import { useRouter } from 'next/navigation';
 
 const Home = () => {
   const [movie, setMovie] = useRecoilState(myMovieList);
+  const router = useRouter()
+  const [showError, setShowError] = useState(false)
 
   useEffect(() => {
-    const token = localStorage.getItem('token')
+    const token = sessionStorage.getItem('token')
     console.log(token);
+    if(!token) {
+      setShowError(true)
+
+      const timer = setTimeout(() => {
+        router.push('/auth/login')
+      }, 2000)
+
+      return () => clearTimeout(timer)
+    }
     
     const fetchMovies = async() => {
       try {
@@ -27,7 +39,25 @@ const Home = () => {
   fetchMovies();
   }, [])
 
-  
+  if (showError) {
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50">
+        <div className="bg-white p-6 rounded-lg max-w-md text-center">
+          <h2 className="text-2xl font-bold text-red-600 mb-4">Unauthorized Access</h2>
+          <p className="text-gray-700 mb-4">
+            Please login to access this page. Redirecting to login...
+          </p>
+          <div className="w-full bg-gray-200 rounded-full h-2.5">
+            <div 
+              className="bg-green-500 h-2.5 rounded-full animate-progress" 
+              style={{ animationDuration: '2s' }}
+            ></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
 
   return (
     <div className='flex flex-col items-center h-[100vh] overflow-x-hidden'>

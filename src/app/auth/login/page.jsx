@@ -40,7 +40,7 @@ const Login = () => {
       if (res.ok) {
         if (!signup) {
           if (response.token) {
-            localStorage.setItem("token", response.token)
+            sessionStorage.setItem("token", response.token)
           }
           window.location.href = "/home"
         } else {

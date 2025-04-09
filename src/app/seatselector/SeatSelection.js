@@ -1,7 +1,7 @@
 "use client"
 
 import Link from 'next/link';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { jwtDecode } from 'jwt-decode';
 
@@ -17,9 +17,22 @@ const SeatSelection = () => {
   const name = searchParams.get("name");
   const time = searchParams.get("time");
   const id  = searchParams.get("id")
-
+  
+  const [showError, setShowError] = useState(false)
   const [isBooking, setIsBooking] = useState(false);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+
+  useEffect(() => {
+    const token = sessionStorage.getItem("token")
+    
+    if(!token) {
+      setShowError(true)
+      const timer = setTimeout(() => {
+        router.push('/auth/login')
+      }, 2000)
+      return () => clearTimeout(timer)
+    }
+  }, [])
 
   const toggleSeatSelection = (seat) => {
     setSelectedSeats((prevSelectedSeats) =>
@@ -131,6 +144,26 @@ let total;
   function handlePush() {
     router.push(`/movie/${id}`)
   }
+
+  if (showError) {
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50">
+        <div className="bg-white p-6 rounded-lg max-w-md text-center">
+          <h2 className="text-2xl font-bold text-red-600 mb-4">Unauthorized Access</h2>
+          <p className="text-gray-700 mb-4">
+            Please login to access this page. Redirecting to login...
+          </p>
+          <div className="w-full bg-gray-200 rounded-full h-2.5">
+            <div 
+              className="bg-green-500 h-2.5 rounded-full animate-progress" 
+              style={{ animationDuration: '2s' }}
+            ></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex flex-col items-center text-white px-4 py-8">
       <div className='mb-4'>
