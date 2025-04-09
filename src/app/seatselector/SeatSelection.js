@@ -221,7 +221,7 @@ let total;
                   isBooking ? 'opacity-75' : ''
                 }`}
                 onClick={handleBooking}
-                disabled={isBooking || selectedSeats.length === 0}
+                // disabled={isBooking || selectedSeats.length === 0}
             >
               {isBooking ? (
                 <>
