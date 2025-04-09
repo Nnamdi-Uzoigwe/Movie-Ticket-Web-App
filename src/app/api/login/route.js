@@ -64,9 +64,9 @@ const JWT_SECRET = process.env.JWT_SECRET;
 
 export default async function handler(req, res) {
   // Set CORS headers
-  res.setHeader('Access-Control-Allow-Origin', 'https://vilancy-movie-ticket-web-app.vercel.app'); // Replace with your specific origin
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  // res.setHeader('Access-Control-Allow-Origin', 'https://vilancy-movie-ticket-web-app.vercel.app'); // Replace with your specific origin
+  // res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  // res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
   // Handle preflight requests
   if (req.method === 'OPTIONS') {
