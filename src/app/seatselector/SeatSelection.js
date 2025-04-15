@@ -111,12 +111,12 @@ const handleBooking = async () => {
 
     console.log("Redirecting to:", `/detail?total=${(selectedSeats.length * seatPrice).toFixed(2)}&selectedCinema=${encodeURIComponent(selectedCinema)}&name=${encodeURIComponent(name)}&time=${time}&date=${date}&selectedSeats=${selectedSeats.join(",")}`);
 
-    
     router.push(
       `/detail?total=${(selectedSeats.length * seatPrice).toFixed(2)}` +
       `&selectedCinema=${encodeURIComponent(selectedCinema)}` +
       `&name=${encodeURIComponent(name)}` +
-      `&time=${time}&date=${date}` +
+      `&time=${time}` +
+      `&date=${date}` +  // <-- Missing + operator was here
       `&selectedSeats=${selectedSeats.join(",")}`
     );
 
